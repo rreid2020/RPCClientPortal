@@ -3,7 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { getPlanTierDisplayName, getPlanTierDescription, type PlanTier } from '@/lib/featureFlags'
+import { getPlanTierDisplayName, getPlanTierDescription } from '@/lib/featureFlags'
+import type { PlanTier } from '@prisma/client'
 import { SparklesIcon } from '@heroicons/react/24/outline'
 
 interface PlanUpgradeCardProps {
