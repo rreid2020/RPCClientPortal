@@ -65,7 +65,7 @@ export async function isFirmSuperAdmin(): Promise<boolean> {
  */
 export async function isFirmStaff(): Promise<boolean> {
   const userProfile = await getCurrentUserProfile()
-  return userProfile?.is_firm_super_admin ?? false || userProfile?.is_firm_staff ?? false
+  return (userProfile?.is_firm_super_admin ?? false) || (userProfile?.is_firm_staff ?? false)
 }
 
 /**
