@@ -44,9 +44,6 @@ export default function HomePage() {
           <h1 className="text-5xl lg:text-6xl font-bold text-slate-800 mb-6 tracking-tight">
             RPC Associates
           </h1>
-          <p className="text-xl lg:text-2xl text-slate-600 mb-4 font-medium">
-            Accounting, Consulting, and Tech Solutions
-          </p>
           <p className="text-lg text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed">
             Your trusted partner for comprehensive financial services, strategic consulting, and innovative technology solutions. 
             Access your secure client portal to manage documents, communicate with our team, and stay connected.
