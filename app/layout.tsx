@@ -15,12 +15,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Get publishable key - use empty string as fallback for build time
-  // DigitalOcean may not have env vars available during build
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ''
-
+  // ClerkProvider will auto-detect NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY from environment
+  // Don't pass it explicitly to allow runtime environment variable detection
   return (
-    <ClerkProvider publishableKey={publishableKey}>
+    <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>{children}</body>
       </html>
