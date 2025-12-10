@@ -1,5 +1,8 @@
 import type { PlanTier } from '@prisma/client'
 
+// Re-export PlanTier for convenience
+export type { PlanTier }
+
 /**
  * Feature flags based on plan tier
  * These functions determine what features are available for each plan
