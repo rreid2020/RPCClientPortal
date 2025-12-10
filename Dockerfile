@@ -6,10 +6,10 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copy package files and prisma schema (needed for postinstall script)
+# Copy package files
 COPY package.json package-lock.json* ./
-COPY prisma ./prisma
-RUN npm ci
+# Install dependencies without running postinstall scripts (Prisma will be generated later)
+RUN npm ci --ignore-scripts
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -20,8 +20,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate
+# Generate Prisma Client (now that we have the schema file)
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Build Next.js application
 ENV NEXT_TELEMETRY_DISABLED 1
