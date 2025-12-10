@@ -15,8 +15,8 @@ export default async function AppLayout({
   try {
     tenant = await getCurrentTenant()
   } catch (error) {
-    // No active organization - redirect to sign-in with org selection
-    redirect('/sign-in?mode=organization')
+    // No active organization - redirect to organization selection page
+    redirect('/select-org')
   }
 
   return (

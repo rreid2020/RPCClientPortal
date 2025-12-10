@@ -37,11 +37,8 @@ export default clerkMiddleware(async (auth, req) => {
     // For /app routes, require active organization
     if (pathname.startsWith('/app')) {
       if (!orgId) {
-        // Redirect to organization selection or creation
-        const orgUrl = new URL('/sign-in', req.url)
-        orgUrl.searchParams.set('redirect_url', pathname)
-        orgUrl.searchParams.set('mode', 'organization')
-        return NextResponse.redirect(orgUrl)
+        // Redirect to organization selection page
+        return NextResponse.redirect(new URL('/select-org', req.url))
       }
     }
 
