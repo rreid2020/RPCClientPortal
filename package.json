@@ -14,7 +14,8 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate --schema=./prisma/schema.prisma"
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
+    "make-admin": "tsx scripts/make-admin.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.0.0",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.33",
-    "prisma": "5.22.0"
+    "prisma": "5.22.0",
+    "tsx": "^4.7.0"
   }
 }
