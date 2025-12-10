@@ -41,29 +41,12 @@ export default function HomePage() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="text-center mb-16">
-          {/* Logo/Brand */}
-          <div className="flex justify-center mb-12">
-            <div className="flex items-center space-x-6">
-              {/* Logo Block */}
-              <div className="w-32 h-32 bg-slate-700 flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-5xl tracking-tight">RPC</span>
-              </div>
-              {/* Logo Text */}
-              <div className="flex flex-col justify-center">
-                <h1 className="text-5xl lg:text-6xl font-bold text-slate-800 mb-2 tracking-tight leading-tight">
-                  RPC
-                </h1>
-                <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 mb-3 tracking-tight">
-                  ASSOCIATES
-                </h2>
-                <div className="text-sm lg:text-base text-slate-600 font-normal space-y-1">
-                  <p>ACCOUNTING</p>
-                  <p>CONSULTING • TECH</p>
-                  <p>SOLUTIONS</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <h1 className="text-5xl lg:text-6xl font-bold text-slate-800 mb-6 tracking-tight">
+            RPC Associates
+          </h1>
+          <p className="text-xl lg:text-2xl text-slate-600 mb-4 font-medium">
+            Accounting, Consulting, and Tech Solutions
+          </p>
           <p className="text-lg text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed">
             Your trusted partner for comprehensive financial services, strategic consulting, and innovative technology solutions. 
             Access your secure client portal to manage documents, communicate with our team, and stay connected.
