@@ -1,7 +1,7 @@
-import type { PlanTier } from '@prisma/client'
+import type { PlanTier as PrismaPlanTier } from '@prisma/client'
 
 // Re-export PlanTier for convenience
-export type { PlanTier }
+export type PlanTier = PrismaPlanTier
 
 /**
  * Feature flags based on plan tier
