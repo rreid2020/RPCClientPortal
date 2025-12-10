@@ -8,7 +8,7 @@ import type { Organization, PlanTier } from '@prisma/client'
  */
 export async function getActiveOrganizationId(): Promise<string | null> {
   const { orgId } = await auth()
-  return orgId
+  return orgId ?? null
 }
 
 /**
