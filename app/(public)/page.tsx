@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { SignedIn, SignedOut, SignInButton, SignUpButton } from '@clerk/nextjs'
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import { 
   DocumentTextIcon, 
@@ -30,9 +30,12 @@ export default function HomePage() {
               </div>
             </div>
             <SignedIn>
-              <Link href="/app">
-                <Button size="sm" className="bg-slate-700 hover:bg-slate-800">Go to Portal</Button>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link href="/app">
+                  <Button size="sm" className="bg-slate-700 hover:bg-slate-800">Go to Portal</Button>
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </div>
             </SignedIn>
           </div>
         </div>

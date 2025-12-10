@@ -1,13 +1,26 @@
 'use client'
 
-import { OrganizationSwitcher, CreateOrganization } from '@clerk/nextjs'
+import { OrganizationSwitcher, CreateOrganization, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 export default function SelectOrganizationPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with sign out */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="text-xl font-bold text-gray-900">
+              RPC Associates
+            </Link>
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        </div>
+      </header>
+
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Select an Organization
@@ -67,6 +80,7 @@ export default function SelectOrganizationPage() {
               Back to Home
             </Button>
           </Link>
+        </div>
         </div>
       </div>
     </div>
