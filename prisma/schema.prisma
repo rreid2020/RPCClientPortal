@@ -2,19 +2,24 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum PlanTier {
   FREE
   STANDARD
   PREMIUM
+}
+
+enum GlobalRoleType {
+  superadmin
+  support
+  auditor
 }
 
 model UserProfile {
@@ -32,12 +37,12 @@ model UserProfile {
 }
 
 model Organization {
-  id          String    @id @default(uuid())
+  id           String   @id @default(uuid())
   clerk_org_id String   @unique
-  name        String
-  plan_tier   PlanTier  @default(FREE)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
+  name         String
+  plan_tier    PlanTier @default(FREE)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
   // Relations
   documents Document[]
@@ -46,13 +51,13 @@ model Organization {
 }
 
 model Document {
-  id                 String   @id @default(uuid())
-  organization_id    String
-  title              String
-  description        String?
+  id                  String   @id @default(uuid())
+  organization_id     String
+  title               String
+  description         String?
   uploaded_by_user_id String
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 
   // Relations
   organization Organization @relation(fields: [organization_id], references: [id], onDelete: Cascade)
@@ -63,4 +68,22 @@ model Document {
   @@map("documents")
 }
 
+// RBAC: Global roles for firm-level permissions (not tied to organizations)
+model GlobalRole {
+  id     Int            @id @default(autoincrement())
+  userId String         @unique // Clerk user ID
+  role   GlobalRoleType
 
+  @@map("global_roles")
+}
+
+// RBAC: Fine-grained user permissions (can be scoped to organizations or global)
+model UserPermission {
+  id         Int     @id @default(autoincrement())
+  userId     String // Clerk user ID
+  orgId      String? // Clerk organization ID (nullable for global permissions)
+  permission String
+
+  @@unique([userId, orgId, permission])
+  @@map("user_permissions")
+}
