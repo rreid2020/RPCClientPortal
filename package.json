@@ -1,6 +1,17 @@
 {
+  "name": "rpc-client-portal",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd backend && npm install && npm run build && cd .. && prisma generate",
+    "start": "cd backend && npm start",
+    "dev": "cd backend && npm run dev",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
+  },
   "devDependencies": {
-    "@prisma/client": "^7.1.0",
-    "prisma": "^7.1.0"
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
   }
 }
