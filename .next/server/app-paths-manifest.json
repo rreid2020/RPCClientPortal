@@ -1,0 +1,16 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(public)/page": "app/(public)/page.js",
+  "/api/documents/[id]/route": "app/api/documents/[id]/route.js",
+  "/(public)/sign-in/[[...sign-in]]/page": "app/(public)/sign-in/[[...sign-in]]/page.js",
+  "/api/documents/route": "app/api/documents/route.js",
+  "/(public)/sign-up/[[...sign-up]]/page": "app/(public)/sign-up/[[...sign-up]]/page.js",
+  "/api/webhooks/clerk/route": "app/api/webhooks/clerk/route.js",
+  "/test/page": "app/test/page.js",
+  "/api/admin/organizations/[id]/route": "app/api/admin/organizations/[id]/route.js",
+  "/(protected)/app/documents/new/page": "app/(protected)/app/documents/new/page.js",
+  "/(protected)/app/documents/page": "app/(protected)/app/documents/page.js",
+  "/(protected)/admin/page": "app/(protected)/admin/page.js",
+  "/(protected)/app/page": "app/(protected)/app/page.js",
+  "/(protected)/app/settings/page": "app/(protected)/app/settings/page.js"
+}

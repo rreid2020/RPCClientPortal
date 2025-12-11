@@ -1,4 +1,4 @@
-import { clerkClient as createClerkClient } from '@clerk/backend'
+import { createClerkClient } from '@clerk/backend'
 import { env } from './env'
 
 // Initialize Clerk client

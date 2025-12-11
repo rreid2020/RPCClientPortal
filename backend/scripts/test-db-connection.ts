@@ -65,7 +65,7 @@ async function main() {
       console.log('   npm run prisma:migrate:dev')
     } else {
       console.log('✅ RBAC tables found:')
-      tables.forEach((table) => {
+      tables.forEach((table: { tablename: string }) => {
         console.log(`   - ${table.tablename}`)
       })
     }

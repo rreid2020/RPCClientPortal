@@ -40,7 +40,7 @@ export async function requireAuth(
 
     // Verify the token with Clerk
     // The Clerk SDK will throw an error if the token is invalid
-    const sessionClaims = await clerkClient.verifyToken(token)
+    const sessionClaims = await (clerkClient as any).verifyToken(token)
 
     // Extract user and organization information
     const userId = sessionClaims.sub // Clerk user ID

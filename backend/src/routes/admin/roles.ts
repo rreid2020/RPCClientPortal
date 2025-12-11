@@ -16,7 +16,8 @@ const router = Router()
 router.post(
   '/roles/grant-superadmin',
   requireSuperAdmin,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req, res: Response) => {
+    const authReq = req as AuthenticatedRequest
     try {
       const { userId } = req.body
 

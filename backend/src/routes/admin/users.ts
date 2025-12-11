@@ -17,7 +17,8 @@ const router = Router()
 router.get(
   '/users',
   requireSuperAdmin,
-  async (req: AuthenticatedRequest, res: Response) => {
+  async (req, res: Response) => {
+    const authReq = req as AuthenticatedRequest
     try {
       // Fetch users from Clerk
       const clerkUsers = await clerkClient.users.getUserList({
@@ -34,12 +35,12 @@ router.get(
 
       // Create a map of global roles by userId
       const globalRoleMap = new Map(
-        globalRoles.map((gr) => [gr.userId, gr.role])
+        globalRoles.map((gr: { userId: string; role: string }) => [gr.userId, gr.role])
       )
 
       // Enrich user data with global roles and organization memberships
       const users = await Promise.all(
-        clerkUsers.data.map(async (clerkUser) => {
+        clerkUsers.data.map(async (clerkUser: any) => {
           // Get user's organization memberships from Clerk
           const orgMemberships = await clerkClient.users
             .getOrganizationMembershipList({ userId: clerkUser.id })
@@ -53,7 +54,7 @@ router.get(
             imageUrl: clerkUser.imageUrl,
             createdAt: clerkUser.createdAt,
             globalRole: globalRoleMap.get(clerkUser.id) || null,
-            organizations: orgMemberships.data.map((membership) => ({
+            organizations: orgMemberships.data.map((membership: any) => ({
               id: membership.organization.id,
               name: membership.organization.name,
               role: membership.role,

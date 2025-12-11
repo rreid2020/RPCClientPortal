@@ -9,9 +9,10 @@ const router = Router()
  * Returns current user information including global role
  * Requires: Any authenticated user
  */
-router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/me', requireAuth, async (req, res: Response) => {
+  const authReq = req as AuthenticatedRequest
   try {
-    const { userId, orgId, orgRole } = req.auth
+    const { userId, orgId, orgRole } = authReq.auth
 
     // Look up the user's global role in the database
     const globalRole = await db.globalRole.findUnique({
