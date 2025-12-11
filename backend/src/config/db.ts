@@ -7,15 +7,23 @@ import { env } from './env'
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
+// Ensure database URL is available
+if (!env.databaseUrl) {
+  throw new Error('DATABASE_URL environment variable is required')
+}
+
+// Create Prisma client with adapter for Prisma 7
+const prismaClientConfig = {
+  log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  adapter: {
+    provider: 'postgresql' as const,
+    url: env.databaseUrl,
+  },
+}
+
 export const db =
   globalForPrisma.prisma ||
-  new PrismaClient({
-    log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    adapter: {
-      provider: 'postgresql',
-      url: env.databaseUrl,
-    },
-  })
+  new PrismaClient(prismaClientConfig)
 
 if (env.nodeEnv !== 'production') {
   globalForPrisma.prisma = db
