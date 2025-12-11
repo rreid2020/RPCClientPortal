@@ -13,6 +13,7 @@ RUN npm ci
 # Copy backend package files
 COPY backend/package.json backend/package-lock.json* ./backend/
 WORKDIR /app/backend
+# Ensure devDependencies are installed (npm ci installs them by default unless NODE_ENV=production)
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Stage 2: Builder
