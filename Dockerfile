@@ -1,4 +1,4 @@
-# Multi-stage build for Next.js production deployment
+# Multi-stage build for Express backend
 # Optimized for DigitalOcean App Platform
 
 # Stage 1: Dependencies
@@ -6,9 +6,13 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Copy package files
+# Copy root package files (for Prisma)
 COPY package.json package-lock.json* ./
-# Install dependencies without running postinstall scripts (Prisma will be generated later)
+RUN npm ci --ignore-scripts
+
+# Copy backend package files
+COPY backend/package.json backend/package-lock.json* ./backend/
+WORKDIR /app/backend
 RUN npm ci --ignore-scripts
 
 # Stage 2: Builder
@@ -18,44 +22,54 @@ WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY --from=deps /app/backend/node_modules ./backend/node_modules
 
-# Generate Prisma Client (now that we have the schema file)
-RUN npx prisma generate --schema=./prisma/schema.prisma
+# Copy Prisma schema and config
+COPY prisma ./prisma
+COPY package.json package-lock.json* ./
 
-# Build Next.js application
-ENV NEXT_TELEMETRY_DISABLED 1
+# Copy backend source
+COPY backend ./backend
+
+# Generate Prisma Client
+WORKDIR /app
+RUN npx prisma generate
+
+# Build backend TypeScript
+WORKDIR /app/backend
 RUN npm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN adduser --system --uid 1001 nodejs
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+# Copy Prisma files
+COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/prisma ./prisma
+
+# Copy backend build output and dependencies
+COPY --from=builder /app/backend/dist ./backend/dist
+COPY --from=builder /app/backend/node_modules ./backend/node_modules
+COPY --from=builder /app/backend/package.json ./backend/package.json
 
 # Set correct permissions
-RUN chown -R nextjs:nodejs /app
+RUN chown -R nodejs:nodejs /app
 
-USER nextjs
+USER nodejs
 
-EXPOSE 3000
+EXPOSE 3001
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3001
+ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
-
+WORKDIR /app/backend
+CMD ["node", "dist/index.js"]
 
