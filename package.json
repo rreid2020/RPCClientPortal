@@ -10,8 +10,11 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy"
   },
+  "dependencies": {
+    "@prisma/client": "^7.1.0"
+  },
   "devDependencies": {
-    "@prisma/client": "^7.1.0",
+    "@prisma/internals": "^7.1.0",
     "@types/node": "^25.0.0",
     "prisma": "^7.1.0"
   }
