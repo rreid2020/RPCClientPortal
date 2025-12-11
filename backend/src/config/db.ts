@@ -31,7 +31,10 @@ try {
   console.log('✅ Prisma adapter created successfully')
 
   // Create Prisma client with adapter for Prisma 7
-  const prismaClientConfig = {
+  const prismaClientConfig: {
+    log: ('query' | 'error' | 'warn' | 'info')[]
+    adapter: PrismaPg
+  } = {
     log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
     adapter,
   }
