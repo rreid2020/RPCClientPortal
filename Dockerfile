@@ -13,8 +13,9 @@ RUN npm ci
 # Copy backend package files
 COPY backend/package.json backend/package-lock.json* ./backend/
 WORKDIR /app/backend
-# Ensure devDependencies are installed (npm ci installs them by default unless NODE_ENV=production)
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+# Explicitly install all dependencies including devDependencies (needed for TypeScript build)
+# npm ci installs devDependencies by default unless NODE_ENV=production
+RUN unset NODE_ENV && if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
