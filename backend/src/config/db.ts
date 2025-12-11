@@ -11,6 +11,10 @@ export const db =
   globalForPrisma.prisma ||
   new PrismaClient({
     log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    adapter: {
+      provider: 'postgresql',
+      url: env.databaseUrl,
+    },
   })
 
 if (env.nodeEnv !== 'production') {
