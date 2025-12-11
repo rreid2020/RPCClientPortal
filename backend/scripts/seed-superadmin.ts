@@ -1,5 +1,7 @@
 import { execSync } from 'child_process'
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import dotenv from 'dotenv'
 import path from 'path'
 
@@ -13,7 +15,16 @@ try {
   // Ignore if already generated
 }
 
-const prisma = new PrismaClient()
+// Create PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+})
+
+// Create Prisma adapter for PostgreSQL
+const adapter = new PrismaPg(pool)
+
+// Create Prisma client with adapter
+const prisma = new PrismaClient({ adapter })
 
 /**
  * Seed script to grant super-admin role to a user

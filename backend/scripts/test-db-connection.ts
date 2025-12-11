@@ -1,11 +1,22 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import dotenv from 'dotenv'
 import path from 'path'
 
 // Load environment variables from root .env
 dotenv.config({ path: path.join(__dirname, '../../.env') })
 
-const prisma = new PrismaClient()
+// Create PostgreSQL connection pool
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+})
+
+// Create Prisma adapter for PostgreSQL
+const adapter = new PrismaPg(pool)
+
+// Create Prisma client with adapter
+const prisma = new PrismaClient({ adapter })
 
 /**
  * Test script to verify database connection
