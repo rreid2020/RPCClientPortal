@@ -37,11 +37,11 @@ router.get(
       })
 
       // Create a map of database orgs by clerk_org_id for quick lookup
-      const dbOrgMap = new Map(dbOrgs.map((org: { clerk_org_id: string; id: number; plan_tier: string }) => [org.clerk_org_id, org]))
+      const dbOrgMap = new Map(dbOrgs.map((org: { clerk_org_id: string; id: string; plan_tier: string }) => [org.clerk_org_id, org]))
 
       // Combine Clerk and database data
       const tenants = clerkOrgs.data.map((clerkOrg: any) => {
-        const dbOrg = dbOrgMap.get(clerkOrg.id) as { id: number; plan_tier: string } | undefined
+        const dbOrg = dbOrgMap.get(clerkOrg.id) as { id: string; plan_tier: string } | undefined
         return {
           id: clerkOrg.id,
           name: clerkOrg.name,
