@@ -15,6 +15,10 @@ COPY backend/package.json backend/package-lock.json* ./backend/
 WORKDIR /app/backend
 RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
 
+# Install @prisma/client in backend (will be overwritten by generated client later)
+WORKDIR /app/backend
+RUN npm install @prisma/client@^7.1.0 --save --ignore-scripts || true
+
 # Stage 2: Builder
 FROM node:20-alpine AS builder
 RUN apk add --no-cache openssl
@@ -50,20 +54,17 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
-# Copy Prisma files and generated client
+# Copy Prisma files
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/.bin ./node_modules/.bin
 
-# Copy backend build output and dependencies
+# Copy backend build output and dependencies (includes @prisma/client)
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
 COPY --from=builder /app/backend/package.json ./backend/package.json
 
-# Copy root package.json for Prisma Client resolution
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+# Copy Prisma Client from root (where it was generated) to backend node_modules
+COPY --from=builder /app/node_modules/.prisma ./backend/node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./backend/node_modules/@prisma
 
 # Set correct permissions
 RUN chown -R nodejs:nodejs /app
