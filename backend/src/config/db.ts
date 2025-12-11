@@ -12,7 +12,7 @@ export const db =
   new PrismaClient({
     log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
     adapter: {
-      provider: 'postgresql',
+      provider: 'postgres',
       url: env.databaseUrl,
     },
   })
