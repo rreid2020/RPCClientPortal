@@ -65,6 +65,9 @@ COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
 COPY --from=builder /app/backend/package.json ./backend/package.json
 
+# Verify dist folder and entry point exist
+RUN ls -la /app/backend/dist/ && test -f /app/backend/dist/index.js || (echo "ERROR: dist/index.js not found" && exit 1)
+
 # Set correct permissions
 RUN chown -R nodejs:nodejs /app
 
@@ -76,5 +79,6 @@ ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
 
 WORKDIR /app/backend
+
 CMD ["node", "dist/index.js"]
 
