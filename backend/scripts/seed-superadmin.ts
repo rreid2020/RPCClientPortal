@@ -1,9 +1,17 @@
+import { execSync } from 'child_process'
 import { PrismaClient } from '@prisma/client'
 import dotenv from 'dotenv'
 import path from 'path'
 
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, '../.env') })
+// Load environment variables from root .env
+dotenv.config({ path: path.join(__dirname, '../../.env') })
+
+// Generate Prisma Client if needed (from root directory)
+try {
+  execSync('cd ../.. && npx prisma generate --schema=./prisma/schema.prisma', { stdio: 'inherit' })
+} catch (error) {
+  // Ignore if already generated
+}
 
 const prisma = new PrismaClient()
 
