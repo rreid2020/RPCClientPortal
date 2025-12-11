@@ -3,21 +3,17 @@
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+RUN apk add --no-cache libc6-compat openssl python3 make g++
 WORKDIR /app
 
 # Copy root package files (for Prisma)
-COPY package.json package-lock.json* ./
-RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Copy backend package files
 COPY backend/package.json backend/package-lock.json* ./backend/
 WORKDIR /app/backend
-RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
-
-# Ensure @prisma/client is installed in backend dependencies
-WORKDIR /app/backend
-RUN npm install @prisma/client@^7.1.0 --save --ignore-scripts
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -42,6 +38,7 @@ RUN npx prisma generate --schema=./prisma/schema.prisma
 # Copy generated Prisma Client to backend node_modules
 RUN cp -r node_modules/.prisma backend/node_modules/.prisma 2>/dev/null || true
 RUN cp -r node_modules/@prisma backend/node_modules/@prisma 2>/dev/null || true
+RUN cp -r node_modules/@prisma/client backend/node_modules/@prisma/client 2>/dev/null || true
 
 # Build backend TypeScript
 WORKDIR /app/backend
