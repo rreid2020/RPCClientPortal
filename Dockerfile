@@ -35,11 +35,15 @@ COPY package.json package-lock.json* ./
 # Copy backend source
 COPY backend ./backend
 
-# Generate Prisma Client (from root where Prisma is installed)
+# Generate Prisma Client into backend node_modules
 WORKDIR /app
-RUN npx prisma generate
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
-# Build backend TypeScript (Prisma Client will be in root node_modules)
+# Copy generated Prisma Client to backend node_modules
+RUN cp -r node_modules/.prisma backend/node_modules/.prisma 2>/dev/null || true
+RUN cp -r node_modules/@prisma backend/node_modules/@prisma 2>/dev/null || true
+
+# Build backend TypeScript
 WORKDIR /app/backend
 RUN npm run build
 
@@ -57,14 +61,10 @@ RUN adduser --system --uid 1001 nodejs
 # Copy Prisma files
 COPY --from=builder /app/prisma ./prisma
 
-# Copy backend build output and dependencies (includes @prisma/client)
+# Copy backend build output and dependencies (includes @prisma/client and generated Prisma Client)
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
 COPY --from=builder /app/backend/package.json ./backend/package.json
-
-# Copy Prisma Client from root (where it was generated) to backend node_modules
-COPY --from=builder /app/node_modules/.prisma ./backend/node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./backend/node_modules/@prisma
 
 # Set correct permissions
 RUN chown -R nodejs:nodejs /app
