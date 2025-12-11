@@ -31,11 +31,15 @@ try {
   console.log('✅ Prisma adapter created successfully')
 
   // Create Prisma client with adapter for Prisma 7
-  const prismaClientConfig: {
-    log: ('query' | 'error' | 'warn' | 'info')[]
-    adapter: PrismaPg
-  } = {
-    log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  // Use string union type that matches Prisma's expected log levels
+  type LogLevel = 'query' | 'info' | 'warn' | 'error'
+  const logLevel: LogLevel[] = env.nodeEnv === 'development' 
+    ? ['query', 'error', 'warn'] 
+    : ['error']
+
+  // Create config without explicit type to allow Prisma to infer correctly
+  const prismaClientConfig = {
+    log: logLevel,
     adapter,
   }
 
