@@ -15,9 +15,9 @@ COPY backend/package.json backend/package-lock.json* ./backend/
 WORKDIR /app/backend
 RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install --ignore-scripts; fi
 
-# Install @prisma/client in backend (will be overwritten by generated client later)
+# Ensure @prisma/client is installed in backend dependencies
 WORKDIR /app/backend
-RUN npm install @prisma/client@^7.1.0 --save --ignore-scripts || true
+RUN npm install @prisma/client@^7.1.0 --save --ignore-scripts
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "cd .. && npx prisma generate && cd backend && tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
     "seed:superadmin": "ts-node scripts/seed-superadmin.ts",
     "test:db": "ts-node scripts/test-db-connection.ts",
