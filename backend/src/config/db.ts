@@ -11,30 +11,44 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
 // Ensure database URL is available
 if (!env.databaseUrl) {
-  throw new Error('DATABASE_URL environment variable is required')
+  const error = new Error('DATABASE_URL environment variable is required')
+  console.error('❌ Prisma configuration error:', error.message)
+  throw error
 }
 
 // Create PostgreSQL connection pool
-const pool = new Pool({
-  connectionString: env.databaseUrl,
-})
+let pool: Pool
+let adapter: PrismaPg
+let db: PrismaClient
 
-// Create Prisma adapter for PostgreSQL
-const adapter = new PrismaPg(pool)
+try {
+  console.log('🔧 Initializing Prisma adapter...')
+  pool = new Pool({
+    connectionString: env.databaseUrl,
+  })
 
-// Create Prisma client with adapter for Prisma 7
-const prismaClientConfig = {
-  log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  adapter,
+  adapter = new PrismaPg(pool)
+  console.log('✅ Prisma adapter created successfully')
+
+  // Create Prisma client with adapter for Prisma 7
+  const prismaClientConfig = {
+    log: env.nodeEnv === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    adapter,
+  }
+
+  db = globalForPrisma.prisma || new PrismaClient(prismaClientConfig)
+  console.log('✅ Prisma client initialized successfully')
+} catch (error: any) {
+  console.error('❌ Failed to initialize Prisma client:', error.message)
+  console.error('Error details:', error)
+  throw new Error(`Prisma initialization failed: ${error.message}`)
 }
-
-export const db =
-  globalForPrisma.prisma ||
-  new PrismaClient(prismaClientConfig)
 
 if (env.nodeEnv !== 'production') {
   globalForPrisma.prisma = db
 }
+
+export { db }
 
 // Graceful shutdown
 process.on('beforeExit', async () => {

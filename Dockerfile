@@ -73,10 +73,13 @@ RUN chown -R nodejs:nodejs /app
 
 USER nodejs
 
+# Expose port (can be overridden by DigitalOcean)
 EXPOSE 3001
 
+# Default environment variables (can be overridden)
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
+ENV NODE_ENV=production
 
 WORKDIR /app/backend
 

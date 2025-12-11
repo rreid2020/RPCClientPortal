@@ -1,5 +1,6 @@
 import { createApp } from './server'
 import { env } from './config/env'
+import { db } from './config/db'
 
 /**
  * Bootstrap the Express server
@@ -9,15 +10,26 @@ async function main() {
     // Load environment variables (already done in config/env.ts, but ensure it's loaded)
     // The env module will throw if required variables are missing
 
+    // Test database connection
+    console.log('🔍 Testing database connection...')
+    try {
+      await db.$connect()
+      console.log('✅ Database connection successful')
+    } catch (dbError: any) {
+      console.error('❌ Database connection failed:', dbError.message)
+      throw new Error(`Database connection failed: ${dbError.message}`)
+    }
+
     // Create the Express app
     const app = createApp()
 
-    // Start the server
-    const server = app.listen(env.port, () => {
-      console.log(`🚀 Server running on port ${env.port}`)
+    // Start the server - bind to 0.0.0.0 to accept connections from all interfaces
+    const host = process.env.HOSTNAME || '0.0.0.0'
+    const server = app.listen(env.port, host, () => {
+      console.log(`🚀 Server running on ${host}:${env.port}`)
       console.log(`📡 Environment: ${env.nodeEnv}`)
-      console.log(`🔗 Health check: http://localhost:${env.port}/health`)
-      console.log(`🔐 API endpoint: http://localhost:${env.port}/api`)
+      console.log(`🔗 Health check: http://${host}:${env.port}/health`)
+      console.log(`🔐 API endpoint: http://${host}:${env.port}/api`)
     })
 
     // Graceful shutdown
