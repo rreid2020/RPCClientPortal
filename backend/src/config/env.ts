@@ -41,3 +41,4 @@ export const env: EnvConfig = {
   frontendUrl: getEnvVar('FRONTEND_URL', 'http://localhost:3000'),
 }
 
+

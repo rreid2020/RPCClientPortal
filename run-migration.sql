@@ -26,3 +26,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS "global_roles_userId_key" ON "global_roles"("u
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "user_permissions_userId_orgId_permission_key" ON "user_permissions"("userId", "orgId", "permission");
 
+
