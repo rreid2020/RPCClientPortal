@@ -1,6 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
+// NOTE: Next.js only loads middleware from the project root (middleware.ts) or src/middleware.ts.
+// Having this file under /app will NOT be picked up, which breaks Clerk's auth()/currentUser().
+
 const isPublicRoute = createRouteMatcher([
   '/',
   '/sign-in(.*)',
@@ -36,15 +39,12 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     // For /app routes, require active organization
-    // Note: Super-admin redirect is handled in the select-org page component
+    // Note: super-admin redirect is handled in server layouts (e.g. /app and /select-org)
     if (pathname.startsWith('/app')) {
       if (!orgId) {
-        // Redirect to organization selection page
         return NextResponse.redirect(new URL('/select-org', req.url))
       }
     }
-
-    // For /admin routes, allow through - role check happens in the page/API route
   }
 
   return NextResponse.next()
@@ -53,4 +53,5 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 }
+
 
