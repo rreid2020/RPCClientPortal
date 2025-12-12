@@ -4,3 +4,4 @@ ON CONFLICT ("userId")
 DO UPDATE SET role = 'superadmin';
 
 
+

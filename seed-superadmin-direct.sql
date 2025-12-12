@@ -11,3 +11,4 @@ DO UPDATE SET role = 'superadmin';
 -- SELECT * FROM global_roles;
 
 
+
