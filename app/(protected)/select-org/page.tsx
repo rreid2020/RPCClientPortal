@@ -3,8 +3,41 @@
 import { OrganizationSwitcher, CreateOrganization, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function SelectOrganizationPage() {
+  const [isCreatingPersonal, setIsCreatingPersonal] = useState(false)
+  const router = useRouter()
+
+  const handleCreatePersonal = async () => {
+    setIsCreatingPersonal(true)
+    try {
+      const response = await fetch('/api/organizations/create-personal', {
+        method: 'POST',
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        // Refresh the page to show the new organization and redirect
+        router.refresh()
+        // Redirect to app after a short delay to allow Clerk to sync
+        setTimeout(() => {
+          window.location.href = '/app'
+        }, 1000)
+      } else {
+        console.error('Failed to create personal organization:', data.error)
+        alert('Failed to create personal organization. Please try again.')
+        setIsCreatingPersonal(false)
+      }
+    } catch (error) {
+      console.error('Error creating personal organization:', error)
+      alert('An error occurred. Please try again.')
+      setIsCreatingPersonal(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with sign out */}
@@ -58,11 +91,41 @@ export default function SelectOrganizationPage() {
             </div>
           </div>
 
+          {/* Quick Create Personal Organization */}
+          <div>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">
+              Individual Client
+            </h3>
+            <p className="text-xs text-gray-500 mb-3">
+              Create a personal account for individual use
+            </p>
+            <Button
+              onClick={handleCreatePersonal}
+              disabled={isCreatingPersonal}
+              className="w-full"
+              variant="outline"
+            >
+              {isCreatingPersonal ? 'Creating...' : 'Create Personal Account'}
+            </Button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">Or</span>
+            </div>
+          </div>
+
           {/* Create Organization */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-3">
-              Create New Organization
+              Company/Organization
             </h3>
+            <p className="text-xs text-gray-500 mb-3">
+              Create an organization for your company or team
+            </p>
             <CreateOrganization
               appearance={{
                 elements: {
