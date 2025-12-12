@@ -1,0 +1,35 @@
+import { redirect } from 'next/navigation'
+import { auth } from '@clerk/nextjs/server'
+import { db } from '@/lib/db'
+
+/**
+ * Layout wrapper that checks if user is super-admin and redirects to /admin
+ * This runs on the server before the page renders
+ */
+export default async function SelectOrgLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const { userId } = await auth()
+
+  if (userId) {
+    try {
+      // Check if user is super-admin
+      const globalRole = await db.globalRole.findUnique({
+        where: { userId },
+      })
+
+      if (globalRole?.role === 'superadmin') {
+        // Redirect super-admins to admin dashboard
+        redirect('/admin')
+      }
+    } catch (error) {
+      // If check fails, continue to show select-org page
+      console.error('Error checking super-admin status:', error)
+    }
+  }
+
+  return <>{children}</>
+}
+
