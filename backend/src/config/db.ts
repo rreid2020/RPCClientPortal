@@ -25,6 +25,12 @@ try {
   console.log('🔧 Initializing Prisma adapter...')
   pool = new Pool({
     connectionString: env.databaseUrl,
+    // DigitalOcean managed Postgres typically requires SSL.
+    // The `pg` library does NOT honor `?sslmode=require` automatically.
+    ssl:
+      env.databaseUrl.includes('sslmode=require') || env.nodeEnv === 'production'
+        ? { rejectUnauthorized: false }
+        : undefined,
   })
 
   adapter = new PrismaPg(pool)
