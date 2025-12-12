@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { Badge } from '@/components/ui/badge'
 import { getPlanTierDisplayName } from '@/lib/featureFlags'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db'
+import { isFirmSuperAdmin } from '@/lib/auth'
 
 export default async function AppLayout({
   children,
@@ -14,13 +14,10 @@ export default async function AppLayout({
 }) {
   const { userId, orgId } = await auth()
 
-  // Check if user is super-admin - redirect to admin dashboard
-  if (userId && !orgId) {
+  // Check if user is super-admin - redirect to admin dashboard (always, regardless of orgId)
+  if (userId) {
     try {
-      const globalRole = await db.globalRole.findUnique({
-        where: { userId },
-      })
-      if (globalRole?.role === 'superadmin') {
+      if (await isFirmSuperAdmin()) {
         redirect('/admin')
       }
     } catch (error) {
@@ -61,5 +58,4 @@ export default async function AppLayout({
     </div>
   )
 }
-
 

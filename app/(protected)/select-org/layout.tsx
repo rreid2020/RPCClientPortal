@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { db } from '@/lib/db'
+import { isFirmSuperAdmin } from '@/lib/auth'
 
 /**
  * Layout wrapper that checks if user is super-admin and redirects to /admin
@@ -18,12 +18,8 @@ export default async function SelectOrgLayout({
   }
 
   try {
-    // Check if user is super-admin
-    const globalRole = await db.globalRole.findUnique({
-      where: { userId },
-    })
-
-    if (globalRole?.role === 'superadmin') {
+    // Check if user is super-admin (supports both new RBAC + legacy flags)
+    if (await isFirmSuperAdmin()) {
       // Redirect super-admins to admin dashboard
       redirect('/admin')
     }
