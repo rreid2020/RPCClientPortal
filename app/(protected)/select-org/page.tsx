@@ -19,21 +19,21 @@ export default function SelectOrganizationPage() {
       
       const data = await response.json()
       
-      if (response.ok) {
-        // Refresh the page to show the new organization and redirect
-        router.refresh()
-        // Redirect to app after a short delay to allow Clerk to sync
+      if (response.ok && data.success) {
+        // Wait a moment for Clerk to sync, then redirect
+        // The middleware will handle setting the active org
         setTimeout(() => {
           window.location.href = '/app'
-        }, 1000)
+        }, 1500)
       } else {
-        console.error('Failed to create personal organization:', data.error)
-        alert('Failed to create personal organization. Please try again.')
+        console.error('Failed to create personal organization:', data)
+        const errorMsg = data.error || data.details || 'Unknown error occurred'
+        alert(`Failed to create personal organization: ${errorMsg}\n\nPlease try creating a company organization instead, or contact support.`)
         setIsCreatingPersonal(false)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating personal organization:', error)
-      alert('An error occurred. Please try again.')
+      alert(`An error occurred: ${error.message || 'Please try again or create a company organization instead.'}`)
       setIsCreatingPersonal(false)
     }
   }
@@ -97,7 +97,7 @@ export default function SelectOrganizationPage() {
               Individual Client
             </h3>
             <p className="text-xs text-gray-500 mb-3">
-              Create a personal account for individual use
+              Create a personal account for individual use. If this button doesn't work, use the "Company/Organization" section below and name it "Personal".
             </p>
             <Button
               onClick={handleCreatePersonal}
