@@ -13,7 +13,7 @@ export default function SelectOrganizationPage() {
   const router = useRouter()
   const { getToken, userId } = useAuth()
 
-  // Check if user is super-admin
+  // Check if user is super-admin and redirect if so
   useEffect(() => {
     async function checkSuperAdmin() {
       if (!userId) {
@@ -31,7 +31,13 @@ export default function SelectOrganizationPage() {
         
         if (response.ok) {
           const data = await response.json()
-          setIsSuperAdmin(data.globalRole === 'superadmin')
+          const isSuperAdminUser = data.globalRole === 'superadmin'
+          setIsSuperAdmin(isSuperAdminUser)
+          
+          // Auto-redirect super-admins to admin dashboard
+          if (isSuperAdminUser) {
+            router.push('/admin')
+          }
         }
       } catch (error) {
         console.error('Error checking super-admin status:', error)
@@ -41,7 +47,7 @@ export default function SelectOrganizationPage() {
     }
 
     checkSuperAdmin()
-  }, [userId, getToken])
+  }, [userId, getToken, router])
 
   const handleCreatePersonal = async () => {
     setIsCreatingPersonal(true)

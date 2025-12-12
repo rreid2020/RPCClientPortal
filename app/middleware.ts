@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
-import { db } from './lib/db'
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -36,27 +35,9 @@ export default clerkMiddleware(async (auth, req) => {
       return NextResponse.redirect(signInUrl)
     }
 
-    // Check if user is super-admin
-    let isSuperAdmin = false
-    try {
-      const globalRole = await db.globalRole.findUnique({
-        where: { userId },
-      })
-      isSuperAdmin = globalRole?.role === 'superadmin'
-    } catch (error) {
-      // If database check fails, continue with normal flow
-      console.error('Error checking super-admin status:', error)
-    }
-
-    // If super-admin tries to access /select-org or /app without org, redirect to /admin
-    if (isSuperAdmin) {
-      if (pathname === '/select-org' || (pathname.startsWith('/app') && !orgId)) {
-        return NextResponse.redirect(new URL('/admin', req.url))
-      }
-    }
-
-    // For /app routes, require active organization (unless super-admin)
-    if (pathname.startsWith('/app') && !isSuperAdmin) {
+    // For /app routes, require active organization
+    // Note: Super-admin redirect is handled in the select-org page component
+    if (pathname.startsWith('/app')) {
       if (!orgId) {
         // Redirect to organization selection page
         return NextResponse.redirect(new URL('/select-org', req.url))
