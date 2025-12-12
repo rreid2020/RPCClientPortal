@@ -4,18 +4,38 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Badge } from '@/components/ui/badge'
 import { getPlanTierDisplayName } from '@/lib/featureFlags'
+import { auth } from '@clerk/nextjs/server'
+import { db } from '@/lib/db'
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { userId, orgId } = await auth()
+
+  // Check if user is super-admin - redirect to admin dashboard
+  if (userId && !orgId) {
+    try {
+      const globalRole = await db.globalRole.findUnique({
+        where: { userId },
+      })
+      if (globalRole?.role === 'superadmin') {
+        redirect('/admin')
+      }
+    } catch (error) {
+      // If check fails, continue with normal flow
+      console.error('Error checking super-admin status:', error)
+    }
+  }
+
   // Ensure user has an active organization
   let tenant
   try {
     tenant = await getCurrentTenant()
-  } catch (error) {
+  } catch (error: any) {
     // No active organization - redirect to organization selection page
+    console.error('Error getting tenant:', error)
     redirect('/select-org')
   }
 

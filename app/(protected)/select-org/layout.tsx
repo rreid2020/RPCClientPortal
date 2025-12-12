@@ -13,21 +13,24 @@ export default async function SelectOrgLayout({
 }) {
   const { userId } = await auth()
 
-  if (userId) {
-    try {
-      // Check if user is super-admin
-      const globalRole = await db.globalRole.findUnique({
-        where: { userId },
-      })
+  if (!userId) {
+    return <>{children}</>
+  }
 
-      if (globalRole?.role === 'superadmin') {
-        // Redirect super-admins to admin dashboard
-        redirect('/admin')
-      }
-    } catch (error) {
-      // If check fails, continue to show select-org page
-      console.error('Error checking super-admin status:', error)
+  try {
+    // Check if user is super-admin
+    const globalRole = await db.globalRole.findUnique({
+      where: { userId },
+    })
+
+    if (globalRole?.role === 'superadmin') {
+      // Redirect super-admins to admin dashboard
+      redirect('/admin')
     }
+  } catch (error: any) {
+    // If check fails (e.g., database connection issue), continue to show select-org page
+    // This allows the page to render even if there's a database issue
+    console.error('Error checking super-admin status in select-org layout:', error?.message || error)
   }
 
   return <>{children}</>
