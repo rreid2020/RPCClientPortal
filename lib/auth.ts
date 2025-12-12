@@ -54,8 +54,22 @@ export async function requireAuth() {
 
 /**
  * Check if the current user is a firm super admin
+ * Checks both the old UserProfile.is_firm_super_admin and the new GlobalRole table
  */
 export async function isFirmSuperAdmin(): Promise<boolean> {
+  const userId = await getCurrentUserId()
+  if (!userId) return false
+
+  // Check new RBAC system (GlobalRole table)
+  const globalRole = await db.globalRole.findUnique({
+    where: { userId },
+  })
+  
+  if (globalRole?.role === 'superadmin') {
+    return true
+  }
+
+  // Fallback to old system (UserProfile.is_firm_super_admin)
   const userProfile = await getCurrentUserProfile()
   return userProfile?.is_firm_super_admin ?? false
 }
@@ -70,16 +84,27 @@ export async function isFirmStaff(): Promise<boolean> {
 
 /**
  * Require firm admin or staff role - throws if user doesn't have permission
+ * Checks both the new GlobalRole table and old UserProfile system
  */
 export async function requireFirmAdmin() {
   const userId = await requireAuth()
+  
+  // Check if user is super-admin via GlobalRole (new RBAC system)
+  const isSuperAdmin = await isFirmSuperAdmin()
+  
+  if (isSuperAdmin) {
+    const userProfile = await getCurrentUserProfile()
+    return userProfile
+  }
+
+  // Fallback to old system (UserProfile.is_firm_staff)
   const userProfile = await getCurrentUserProfile()
   
   if (!userProfile) {
     throw new Error('Unauthorized: User profile not found')
   }
 
-  if (!userProfile.is_firm_super_admin && !userProfile.is_firm_staff) {
+  if (!userProfile.is_firm_staff) {
     throw new Error('Unauthorized: Firm admin or staff role required')
   }
 

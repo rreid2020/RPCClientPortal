@@ -1,14 +1,47 @@
 'use client'
 
-import { OrganizationSwitcher, CreateOrganization, UserButton } from '@clerk/nextjs'
+import { OrganizationSwitcher, CreateOrganization, UserButton, useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function SelectOrganizationPage() {
   const [isCreatingPersonal, setIsCreatingPersonal] = useState(false)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
   const router = useRouter()
+  const { getToken, userId } = useAuth()
+
+  // Check if user is super-admin
+  useEffect(() => {
+    async function checkSuperAdmin() {
+      if (!userId) {
+        setIsChecking(false)
+        return
+      }
+
+      try {
+        const token = await getToken()
+        const response = await fetch('/api/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setIsSuperAdmin(data.globalRole === 'superadmin')
+        }
+      } catch (error) {
+        console.error('Error checking super-admin status:', error)
+      } finally {
+        setIsChecking(false)
+      }
+    }
+
+    checkSuperAdmin()
+  }, [userId, getToken])
 
   const handleCreatePersonal = async () => {
     setIsCreatingPersonal(true)
@@ -64,6 +97,37 @@ export default function SelectOrganizationPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
+          {/* Super Admin Access */}
+          {isChecking ? (
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-500">Checking permissions...</p>
+            </div>
+          ) : isSuperAdmin ? (
+            <>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-blue-900 mb-2">
+                  Super Admin Access
+                </h3>
+                <p className="text-xs text-blue-700 mb-3">
+                  You have super-admin privileges. You can access the admin dashboard without an organization.
+                </p>
+                <Link href="/admin">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                    Go to Admin Dashboard
+                  </Button>
+                </Link>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or</span>
+                </div>
+              </div>
+            </>
+          ) : null}
+
           {/* Organization Switcher - shows existing orgs */}
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-3">
